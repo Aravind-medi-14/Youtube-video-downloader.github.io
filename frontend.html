@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="favicon.png" sizes="64x64" />
+    <title>YouTube Video Downloader</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        background-color: lightgray;
+        height: 100%;
+        margin: 0;
+      }
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .content {
+        flex: 1;
+      }
+      .loading {
+        display: none;
+        text-align: center;
+      }
+      .slide {
+        background-color: rgb(168, 165, 161);
+        color: red;
+      }
+      #main-content.active,
+      #about-content.active {
+        display: block; /* Show the active section */
+      }
+
+      #main-content:not(.active),
+      #about-content:not(.active) {
+        display: none; /* Hide the inactive section */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Navigation Bar -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#" onclick="showHome()">YT Downloader</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#" onclick="showHome()">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showAbout()">About</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div class="slide">
+        <marquee behavior="" direction="left">
+          * If specified quality type is not working , please use 1080p as
+          quality type *
+        </marquee>
+      </div>
+      <!-- Main Content -->
+      <div id="main-content" class="container mt-5 content active">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <h1 class="text-center mb-4">YouTube Video Downloader</h1>
+
+            <!-- URL Input Form -->
+            <form id="downloadForm" method="POST">
+              <div class="form-group">
+                <label for="videoUrl">Enter YouTube Video URL</label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="videoUrl"
+                  placeholder="https://www.youtube.com/watch?v=example"
+                  required
+                />
+              </div>
+
+              <!-- Quality Selection -->
+              <div class="form-group">
+                <label for="qualitySelect">Select Quality</label>
+                <select class="form-control" id="qualitySelect">
+                  <option>1080p</option>
+                  <option>720p</option>
+                  <option>480p</option>
+                  <option>360p</option>
+                </select>
+              </div>
+
+              <!-- Download Button -->
+              <button type="submit" class="btn btn-primary btn-block">
+                Download
+              </button>
+
+              <!-- Loading Spinner -->
+              <div class="loading" id="loadingMessage">
+                <p>Downloading...</p>
+              </div>
+            </form>
+
+            <script>
+              function showHome() {
+                document.getElementById("main-content").classList.add("active");
+                document
+                  .getElementById("about-content")
+                  .classList.remove("active");
+              }
+
+              function showAbout() {
+                document
+                  .getElementById("about-content")
+                  .classList.add("active");
+                document
+                  .getElementById("main-content")
+                  .classList.remove("active");
+              }
+
+              document
+                .getElementById("downloadForm")
+                .addEventListener("submit", async function (event) {
+                  event.preventDefault();
+                  // Get the input values from the form
+                  const url = document.getElementById("videoUrl").value;
+                  const quality =
+                    document.getElementById("qualitySelect").value;
+                  // Show loading message
+                  document.getElementById("loadingMessage").style.display =
+                    "block";
+                  try {
+                    // Make the POST request to the backend
+                    const response = await fetch(
+                      "http://127.0.0.1:8000/download/",
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ url, quality }),
+                      }
+                    );
+                    // Hide loading message
+                    document.getElementById("loadingMessage").style.display =
+                      "none";
+                    if (response.ok) {
+                      // Parse the JSON response
+                      const data = await response.json();
+                      // Display success message
+                      alert(data.message || "Video download started!");
+                    } else {
+                      // Parse the error response
+                      const error = await response.json();
+                      alert(
+                        "Error: " +
+                          (error.error || "Unable to download the video.")
+                      );
+                    }
+                  } catch (err) {
+                    console.error("Error:", err);
+                    // Hide loading message
+                    document.getElementById("loadingMessage").style.display =
+                      "none";
+                  }
+                });
+            </script>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Section -->
+      <div id="about-content" class="content">
+        <div class="container mt-5">
+          <h1 class="text-center mb-4">About YT Downloader</h1>
+          <p class="text-center">
+            <p>
+              Welcome to the YouTube Video Downloader! This application allows users to download YouTube videos . It is built with a modern frontend design using HTML, CSS, and JavaScript, and a robust backend powered by FastAPI.
+          </p>
+          <p>
+              The application focuses on providing an easy-to-use interface with real-time feedback for downloads. It ensures efficient processing and user-friendly interactions, making it a reliable tool for downloading videos from YouTube. The backend handles video processing while the frontend delivers a smooth user experience.
+          </p>
+          <p>
+              We aim to simplify the process of downloading videos with an intuitive interface and high-quality options for users. Feel free to explore the application and enjoy its features!
+          </p>
+          <p class="text-center">
+            Built with love by Aravind Medi in 2024.
+          </p>
+      
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2024 Aravind Medi. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
